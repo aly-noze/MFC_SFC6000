@@ -53,7 +53,7 @@ class MFC_SFC6000:
         ### self.unit maps to get_calibration_gas_units(index)
         # https://sensirion.github.io/python-uart-sfx6xxx/_modules/sensirion_uart_sfx6xxx/device.html#Sfx6xxxDeviceBase.get_calibration_gas_unit
         # Note: I am unsure what is wanted as the index, I assume it is the calibration gas unit index - Anthony Ly
-        self.unit = Sfx6xxxDeviceBase.get_calibration_gas_unit(index = analyte)
+        self.unit = Sfx6xxxDeviceBase.get_calibration_gas_unit(self, analyte)
         """
         self.unit = Sfc5xxxMediumUnit(
             Sfc5xxxUnitPrefix.MILLI,

@@ -113,7 +113,7 @@ class MFC:
 
 if __name__ == "__main__":
     try:
-        A = MFC("COM8", "Nitrogen")
+        A = MFC("COM4", "Nitrogen")
         A.test_run()
     except KeyboardInterrupt:
         print("\nInterrupted by user.")

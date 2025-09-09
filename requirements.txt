@@ -1,1 +1,4 @@
 sensirion_uart_sfx6xxx
+
+sensirion-shdlc-driver
+sensirion_shdlc_sfc5xxx
