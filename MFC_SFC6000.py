@@ -7,6 +7,8 @@
 # from sensirion_uart_sfx6xxx.commands import StatusCode
 
 from sensirion_uart_sfx6xxx.device import Sfx6xxxDeviceBase
+from sensirion_driver_adapters.shdlc_adapter.shdlc_channel import ShdlcChannel
+
 
 import logging
 import atexit
@@ -45,7 +47,8 @@ logging.basicConfig(level=logging.INFO)
 
 class MFC_SFC6000:
     def __init__(self, port, analyte=None, retries=3):
-        self.port = port
+        channel = ShdlcChannel(port)
+        self._channel = channel
         self.analyte = analyte
         self.scaling = 0x02
         self.serial_port = None  # Ensure always initialized
@@ -147,7 +150,7 @@ class MFC_SFC6000:
 
 if __name__ == "__main__":
     try:
-        A = MFC_SFC6000("COM8", "Nitrogen")
+        A = MFC_SFC6000("COM4", "Nitrogen")
         A.test_run()
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
