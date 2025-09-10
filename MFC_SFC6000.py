@@ -56,14 +56,15 @@ class MFC_SFC6000:
         ### self.unit maps to get_calibration_gas_units(index)
         # https://sensirion.github.io/python-uart-sfx6xxx/_modules/sensirion_uart_sfx6xxx/device.html#Sfx6xxxDeviceBase.get_calibration_gas_unit
         # Note: I am unsure what is wanted as the index, I assume it is the calibration gas unit index - Anthony Ly
-        self.unit = Sfx6xxxDeviceBase.get_calibration_gas_unit(self, analyte)
+        index = 0 # They said to look at the appendix but I don't see the appendix anywhere
+        self.unit = Sfx6xxxDeviceBase.get_calibration_gas_unit(self, index)
         """
         self.unit = Sfc5xxxMediumUnit(
             Sfc5xxxUnitPrefix.MILLI,
             Sfc5xxxUnit.STANDARD_LITER,
             Sfc5xxxUnitTimeBase.MINUTE)
         """
-        self.threshold = 10  # in sccm
+        self.threshold = 5  # in sccm
         self.current_setpoint = 0
 
         success = self.try_open_port(retries)
@@ -100,62 +101,3 @@ class MFC_SFC6000:
             self.Sfx6xxxDeviceBase.set_setpoint(self.current_setpoint, scaling=self.scaling)
         except Exception as e:
             logging.warning(f"MFC on port {self.port} with analyte {self.analyte} raised the following issue: {e}. Device status is {self.device.read_device_status()}")
-
-    # Funtion to Monitor 
-    def ensure_flow_rate(self, value):
-        logging.debug(f"Ensuring Flow rate for MFC on {self.port} is value: {value}")
-        self.set_flow_rate(value=value)
-        while abs(self.get_current_flow_value() - self.current_setpoint) > self.threshold:
-            logging.warning(f'MFC on port {self.port} with analyte {self.analyte} flow rate is {self.get_current_flow_value()}. Set point is {self.current_setpoint}')
-            time.sleep(0.1)
-
-    # Test Run with Keyboard Controls (0 -> Off, 1 -> On, 999 -> Exit)
-    def test_run(self):
-        val = 0
-        while val != 999:
-            try:
-                val = int(input('Type in 0 to turn off, 1 to turn on, 999 to exit the system: '))
-                if val == 999:
-                    break
-                else:
-                    self.ensure_flow_rate(val)
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-        self.exit_procedure()
-
-    # Test Run with Flow = 100 and Duration = 150
-    def run_fixed_cycle(self, flow=100, duration=150):
-        self.set_flow_rate(flow)
-        time.sleep(duration)
-        self.set_flow_rate(0)
-
-    # To Exit
-    def exit_procedure(self):
-        try:
-            if self.device:
-                print("bingo")
-                self.set_flow_rate(0)
-                print("boom")
-                logging.info("Exiting the system")
-        except Exception as e:
-            logging.warning(f"Exception during exit: {e}")
-        finally:
-            if self.serial_port:
-                try:
-                    self.serial_port.close()
-                    logging.info(f"Closed serial port {self.port}")
-                except Exception as e:
-                    logging.warning(f"Error closing port {self.port}: {e}")
-                self.serial_port = None
-
-if __name__ == "__main__":
-    try:
-        A = MFC_SFC6000("COM4", "Nitrogen")
-        A.test_run()
-    except KeyboardInterrupt:
-        print("\nInterrupted by user.")
-    except Exception as e:
-        logging.error(f"Unexpected error: {e}")
-    finally:
-        if 'A' in locals():
-            A.exit_procedure()

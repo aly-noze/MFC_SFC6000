@@ -28,16 +28,12 @@ with ShdlcSerialPort(port=args.serial_port, baudrate=115200) as port:
     sensor.device_reset()
     time.sleep(2.0)
     serial_number = sensor.get_serial_number()
-    print(f"get_serial_number: {serial_number}; ")
-
-    chosen_setpoint = 5 # IMPORTANT: MAX VALUE IS 5 AS INDICATED BY THE -5SLM
-    sensor.set_setpoint(chosen_setpoint)
-    print(f"set_setpoint: {chosen_setpoint}; ")
-
-    setpoint = sensor.get_setpoint()
-    print(f"get_setpoint: {setpoint}; ")
-
-    for i in range(200):
+    print(f"serial_number: {serial_number}; ")
+    
+    ccm = 500
+    slm = ccm/1000
+    sensor.set_setpoint(slm)
+    for i in range(100):
         try:
             averaged_measured_value = sensor.read_averaged_measured_value(10)
             print(f"averaged_measured_value: {averaged_measured_value}; ")
